@@ -12,6 +12,12 @@ def index():
     return send_file(ROOT / "web" / "index.html")
 
 
+@app.get("/api/config")
+def config():
+    cfg = load_config()
+    return jsonify(company=cfg["company_name"])
+
+
 @app.get("/api/drafts")
 def drafts():
     out = []
