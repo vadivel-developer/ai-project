@@ -1,6 +1,6 @@
 import sqlite3
 
-from .config import DB_PATH
+from . import config
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS videos (
@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS videos (
 """
 
 
-def connect(path=DB_PATH) -> sqlite3.Connection:
-    conn = sqlite3.connect(path)
+def connect(path=None) -> sqlite3.Connection:
+    conn = sqlite3.connect(path or config.DB_PATH)
     conn.row_factory = sqlite3.Row
     conn.execute(SCHEMA)
     return conn

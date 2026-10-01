@@ -19,7 +19,8 @@ python main.py run            # make drafts in ./drafts/<video_id>/ (post.txt + 
 python main.py list           # see status
 python main.py approve <id>   # publish to LinkedIn after you review
 python main.py skip <id>
-python -m pytest              # tests
+python -m pytest              # 44 unit/API tests (no internet or keys needed)
+python e2e/ui_check.py        # browser test of every UI button (app must be running)
 ```
 
 ## Web UI

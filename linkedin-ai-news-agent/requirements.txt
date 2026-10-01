@@ -1,5 +1,5 @@
 feedparser>=6.0
-youtube-transcript-api>=0.6.2
+youtube-transcript-api>=1.0
 openai>=1.30
 huggingface_hub>=0.24
 pillow>=10.0
