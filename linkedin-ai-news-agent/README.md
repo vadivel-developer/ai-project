@@ -21,6 +21,7 @@ python main.py approve <id>   # publish to LinkedIn after you review
 python main.py skip <id>
 python -m pytest              # 44 unit/API tests (no internet or keys needed)
 python e2e/ui_check.py        # browser test of every UI button (app must be running)
+python e2e/mobile_check.py    # phone/tablet layout test on 6 device sizes
 ```
 
 ## Web UI
@@ -43,6 +44,11 @@ The UI shows which one made the image. If none work, a gradient is used so a fil
 Every draft always gets an image with a **title** and a **short description**.
 The background is an AI image (Hugging Face) if it works, otherwise a brand gradient, so image creation never fails.
 In the UI you can edit the image title/description, click **Update image text**, or **New AI background**.
+
+## Mobile
+On phones the draft opens in three tabs (**Text / Preview / Actions**), the queue is a swipe row, and navigation is a bottom bar.
+Inputs are 16px so iPhones don't zoom, and the layout respects the notch / home-bar safe areas.
+Landscape phones use the same layout.
 
 ## Put it online (Render)
 1. In Render: **New > Blueprint**, pick this repo and this branch (`render.yaml` is at the repo root).

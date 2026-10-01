@@ -1,6 +1,6 @@
 """Browser test of the whole UI (needs: pip install playwright; a Chromium browser).
 Start the app first (python app.py), then:  python e2e/ui_check.py
-Uses the demo draft; change BASE if you run on another port. WARNING: it skips/edits demo data in your local db."""
+WARNING: it edits/skips the demo draft in your local database."""
 from playwright.sync_api import sync_playwright
 results = []
 def check(name, cond, extra=""):
@@ -70,6 +70,7 @@ with sync_playwright() as p:
 
     # Skip + filters
     pg.click("#skip"); wait_toast("Skipped")
+    pg.wait_for_function("document.querySelector('.s-skipped .num').textContent=='1'", timeout=5000)
     check("skip moves to skipped", pg.locator(".s-skipped .num").inner_text()=="1")
     pg.click('.nav-btn[data-f="skipped"]'); pg.wait_for_selector(".item")
     check("skipped filter lists it", pg.locator(".item").count()==1)
@@ -86,7 +87,7 @@ with sync_playwright() as p:
     check("phone: no horizontal scroll", not m.evaluate("document.documentElement.scrollWidth>innerWidth"))
     box = m.locator("#nav").bounding_box()
     check("phone: nav is a bottom bar", box["y"] > 600 and box["width"]>=380, box)
-    check("phone: buttons >= 44px tall", m.evaluate("[...document.querySelectorAll('.btn')].every(b=>b.getBoundingClientRect().height>=40)"))
+    check("phone: buttons >= 44px tall", m.evaluate("[...document.querySelectorAll('.btn')].filter(b=>b.offsetParent!==null).every(b=>b.getBoundingClientRect().height>=40)"))
 
     check("no JavaScript errors", not errs, errs)
     b.close()
