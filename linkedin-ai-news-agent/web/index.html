@@ -109,6 +109,10 @@ textarea:read-only{opacity:.85}
 .who span{font-size:11px;color:var(--muted)}
 .body{padding:0 14px 14px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13.5px}
 .card img{width:100%;display:block}
+.field{display:grid;gap:6px;margin-top:14px}.field label{font-size:12px;font-weight:500;color:var(--muted)}
+.field input,.field textarea.sm{width:100%;min-height:0;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);font:inherit;line-height:1.5}
+.field input:focus,.field textarea.sm:focus{border-color:var(--accent);outline:3px solid var(--accent-soft)}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.row .btn{flex:1 1 140px;min-height:40px;padding:0 14px}
 .hint{font-size:12px;color:var(--muted);margin-top:4px}
 
 #toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,30px);opacity:0;visibility:hidden;padding:12px 22px;
@@ -224,7 +228,15 @@ function detailTiles(d){
         <div class="who"><div class="av">${esc(initials)}</div><div><b>${esc(company)}</b><span>Just now</span></div></div>
         <div class="body" id="prev"></div>
         ${d.has_image?`<img src="/api/drafts/${d.id}/image?${Date.now()}" alt="Post image">`:""}
-      </div></div>
+      </div>
+      ${editable?`
+      <div class="field"><label for="ctitle">Image title</label>
+        <input id="ctitle" maxlength="80" value="${esc(d.card.title)}"></div>
+      <div class="field"><label for="cdesc">Image description</label>
+        <textarea class="sm" id="cdesc" rows="2" maxlength="160">${esc(d.card.description)}</textarea></div>
+      <div class="row"><button class="btn" id="img-update">Update image text</button>
+        <button class="btn" id="img-new">New AI background</button></div>`:""}
+    </div>
     <div class="tile actions"><h3>Actions</h3>
       ${editable?`<button class="btn primary" id="approve">Approve and publish</button>
                   <button class="btn" id="save">Save edits</button>`:""}
@@ -243,6 +255,13 @@ function wire(d){
   ta.oninput = upd; upd();
   $("#copy").onclick = async()=>{try{await navigator.clipboard.writeText(ta.value);toast("Copied to clipboard")}catch{toast("Copy failed")}};
   if(!editable) return;
+  const regen = async(newBg, btn)=>{
+    btn.disabled=true; const old=btn.textContent; btn.textContent="Working...";
+    await api("/api/drafts/"+d.id+"/image","POST",{title:$("#ctitle").value,description:$("#cdesc").value,new_background:newBg});
+    toast("Image updated"); load(true);
+  };
+  $("#img-update").onclick = e=>regen(false, e.currentTarget);
+  $("#img-new").onclick = e=>regen(true, e.currentTarget);
   $("#save").onclick = async()=>{await api("/api/drafts/"+d.id,"POST",{text:ta.value});toast("Saved");load(true)};
   $("#skip").onclick = async()=>{await api("/api/drafts/"+d.id+"/skip","POST");toast("Skipped");load()};
   $("#approve").onclick = async e=>{

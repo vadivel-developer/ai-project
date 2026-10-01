@@ -29,6 +29,11 @@ python app.py        # open http://localhost:5000
 Review drafts, edit text, preview the LinkedIn card, then Approve, Skip, Copy text or Download image.
 Click **Try demo** to see it without any API keys.
 
+## Post image
+Every draft always gets an image with a **title** and a **short description**.
+The background is an AI image (Hugging Face) if it works, otherwise a brand gradient, so image creation never fails.
+In the UI you can edit the image title/description, click **Update image text**, or **New AI background**.
+
 ## Notes
 - Posting needs LinkedIn **Community Management API** approval. Until then, copy `post.txt` and `image.png` and post by hand.
 - Posts are written in the LLM's own words and credit the creator with a link. Always review before approving.

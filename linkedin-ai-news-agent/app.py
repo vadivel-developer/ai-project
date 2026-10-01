@@ -28,6 +28,7 @@ def drafts():
             "url": r["url"], "status": r["status"],
             "text": pipeline.read_text(r["video_id"]) if (folder / "post.txt").exists() else "",
             "has_image": (folder / "image.png").exists(),
+            "card": pipeline.read_card(r["video_id"]),
         })
     return jsonify(out)
 
@@ -40,6 +41,16 @@ def image(vid):
 @app.post("/api/drafts/<vid>")
 def save(vid):
     pipeline.save_text(vid, request.json.get("text", ""))
+    return jsonify(ok=True)
+
+
+@app.post("/api/drafts/<vid>/image")
+def regenerate_image(vid):
+    """Rebuild the image from edited title/description (new AI background if `new_background`)."""
+    body = request.json or {}
+    card = pipeline.read_card(vid)
+    pipeline.save_card(vid, body.get("title", card["title"]), body.get("description", card["description"]))
+    pipeline.render_image(vid, load_config(), use_ai=bool(body.get("new_background", True)))
     return jsonify(ok=True)
 
 
