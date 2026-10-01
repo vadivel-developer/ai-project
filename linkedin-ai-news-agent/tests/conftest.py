@@ -24,3 +24,13 @@ def sandbox(tmp_path, monkeypatch):
 @pytest.fixture
 def cfg():
     return dict(CFG)
+
+
+@pytest.fixture
+def mark_ai():
+    """Pretend the draft's image came from an AI provider (publishing requires that)."""
+    def _mark(video_id, provider="cloudflare"):
+        card = pipeline.read_card(video_id)
+        card["bg"] = provider
+        (pipeline.draft_dir(video_id) / "card.json").write_text(__import__("json").dumps(card))
+    return _mark

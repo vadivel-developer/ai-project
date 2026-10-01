@@ -18,9 +18,9 @@ def test_demo_list_skip(monkeypatch, capsys, cfg):
     assert store.list_all(store.connect())[0]["status"] == "skipped"
 
 
-def test_approve_command(monkeypatch, capsys, cfg):
+def test_approve_command(monkeypatch, capsys, cfg, mark_ai):
     monkeypatch.setattr(main, "load_config", lambda: cfg)
-    run_cli(monkeypatch, "demo")
+    run_cli(monkeypatch, "demo"); mark_ai("demo0001")
     monkeypatch.setattr(pipeline, "publish", lambda t, i: "urn:x")
     run_cli(monkeypatch, "approve", "demo0001")
     assert "published: urn:x" in capsys.readouterr().out

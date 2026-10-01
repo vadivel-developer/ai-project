@@ -4,7 +4,7 @@ import re
 
 from . import store
 from .config import DRAFTS_DIR
-from .image import make_card
+from .image import render_card
 from .linkedin import publish
 from .writer import with_credit, write_card_text, write_image_prompt, write_post
 from .youtube import get_transcript, latest_videos
@@ -45,6 +45,8 @@ def create_drafts(cfg: dict, log=print) -> int:
             save_card(video["id"], title, desc, prompt, source=video["channel"])
             render_image(video["id"], cfg)
             made += 1
+            if read_card(video["id"]).get("bg") == "gradient":
+                log("WARNING: no AI image could be made (check image keys); used a gradient")
             log(f"draft ready: {video['title']}")
     return made
 
@@ -65,12 +67,15 @@ def save_card(video_id: str, title: str, description: str, prompt: str | None = 
     (draft_dir(video_id) / "card.json").write_text(json.dumps(card, ensure_ascii=False), encoding="utf-8")
 
 
-def render_image(video_id: str, cfg: dict, use_ai: bool = True) -> None:
+def render_image(video_id: str, cfg: dict, use_ai: bool = True) -> str:
     """(Re)make image.png from the saved title, description and prompt. Always succeeds."""
     card = read_card(video_id)
-    make_card(card["title"], card["description"], card["prompt"], cfg["brand_color"],
-              cfg["company_name"], draft_dir(video_id) / "image.png", use_ai=use_ai,
-              source=card.get("source", ""))
+    provider = render_card(card["title"], card["description"], card["prompt"], cfg["brand_color"],
+                           cfg["company_name"], draft_dir(video_id) / "image.png", use_ai=use_ai,
+                           source=card.get("source", ""))
+    card["bg"] = provider  # remembered so the UI can show it and publish can check it
+    (draft_dir(video_id) / "card.json").write_text(json.dumps(card, ensure_ascii=False), encoding="utf-8")
+    return provider
 
 
 def create_demo_draft(cfg: dict) -> str:
@@ -105,8 +110,11 @@ def save_text(video_id: str, text: str) -> None:
     (draft_dir(video_id) / "post.txt").write_text(text, encoding="utf-8")
 
 
-def approve(video_id: str) -> str:
+def approve(video_id: str, require_ai_image: bool = True) -> str:
     folder = draft_dir(video_id)
+    if require_ai_image and read_card(video_id).get("bg", "gradient") == "gradient":
+        raise RuntimeError("This post has no AI-generated image yet. Click 'New AI background' and "
+                           "try again (check your Cloudflare / Hugging Face keys).")
     urn = publish(read_text(video_id), str(folder / "image.png"))
     store.set_status(store.connect(), video_id, "published")
     return urn

@@ -78,7 +78,7 @@ def skip(vid):
 @app.post("/api/drafts/<vid>/approve")
 def approve(vid):
     try:
-        return jsonify(ok=True, urn=pipeline.approve(vid))
+        return jsonify(ok=True, urn=pipeline.approve(vid, load_config().get("require_ai_image", True)))
     except Exception as e:  # show a friendly message in the UI
         return jsonify(ok=False, error=str(e)), 400
 

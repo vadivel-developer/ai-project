@@ -8,3 +8,4 @@ posts_per_day: 1          # how many drafts to make per run
 company_name: Your Company
 brand_color: "#0A66C2"
 hashtags: ["#AI", "#GenerativeAI", "#Tech"]
+require_ai_image: true   # refuse to publish a post whose image has no AI background

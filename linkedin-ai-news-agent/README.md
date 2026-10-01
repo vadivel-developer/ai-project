@@ -31,6 +31,15 @@ Review drafts, edit text, preview the LinkedIn card, then Approve, Skip, Copy te
 Click **Try demo** to see it without any API keys.
 
 ## Post image
+**An AI-generated image is required.** Free providers are tried in order (`IMAGE_PROVIDERS` in `.env`):
+1. **Cloudflare Workers AI** (FLUX.1 schnell, ~230 free images/day): set `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`
+2. **Pollinations** (no key needed, rate limited)
+3. **Hugging Face** (small free credit): `HF_TOKEN`
+
+The UI shows which one made the image. If none work, a gradient is used so a file always exists, but
+**publishing is blocked** until you click **New AI background** and one succeeds
+(turn this off with `require_ai_image: false` in `config.yaml`).
+
 Every draft always gets an image with a **title** and a **short description**.
 The background is an AI image (Hugging Face) if it works, otherwise a brand gradient, so image creation never fails.
 In the UI you can edit the image title/description, click **Update image text**, or **New AI background**.

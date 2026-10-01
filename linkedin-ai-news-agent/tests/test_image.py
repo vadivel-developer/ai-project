@@ -4,7 +4,7 @@ from agent import image
 
 
 def test_card_is_always_made_without_ai(tmp_path, monkeypatch):
-    monkeypatch.setattr(image, "generate_background", lambda prompt: None)
+    monkeypatch.setattr(image, "generate_background", lambda prompt: (None, None))
     out = image.make_card("Five AI breakthroughs for this week",
                           "Smaller models and smarter agents make AI easier to use.",
                           "p", "#0A66C2", "Co", tmp_path / "c.png")

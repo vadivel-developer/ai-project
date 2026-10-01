@@ -5,6 +5,11 @@ The text is drawn by us, so it is always sharp and spelled correctly.
 """
 from pathlib import Path
 
+import base64
+import io
+import urllib.parse
+
+import requests
 from huggingface_hub import InferenceClient
 from PIL import Image, ImageDraw, ImageFont
 
@@ -65,24 +70,66 @@ def gradient_background(brand_color: str) -> Image.Image:
     return img
 
 
-def generate_background(prompt: str, attempts: int = 2) -> Image.Image | None:
-    """AI background from Hugging Face. Returns None if it can't be made."""
-    if not prompt or not env("HF_TOKEN"):
-        return None
-    for _ in range(attempts):
+def _cloudflare(prompt: str) -> Image.Image:
+    acct, token = env("CLOUDFLARE_ACCOUNT_ID"), env("CLOUDFLARE_API_TOKEN")
+    if not (acct and token):
+        raise RuntimeError("Cloudflare keys not set")
+    r = requests.post(
+        f"https://api.cloudflare.com/client/v4/accounts/{acct}/ai/run/@cf/black-forest-labs/flux-1-schnell",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"prompt": prompt, "steps": 4}, timeout=90)
+    r.raise_for_status()
+    return Image.open(io.BytesIO(base64.b64decode(r.json()["result"]["image"])))
+
+
+def _pollinations(prompt: str) -> Image.Image:
+    url = (f"https://image.pollinations.ai/prompt/{urllib.parse.quote(prompt)}"
+           f"?width={SIZE[0]}&height={SIZE[1]}&model=flux&nologo=true")
+    r = requests.get(url, timeout=90)
+    r.raise_for_status()
+    return Image.open(io.BytesIO(r.content))
+
+
+def _huggingface(prompt: str) -> Image.Image:
+    if not env("HF_TOKEN"):
+        raise RuntimeError("HF_TOKEN not set")
+    return InferenceClient(token=env("HF_TOKEN")).text_to_image(prompt, model=env("IMAGE_MODEL"))
+
+
+PROVIDERS = {"cloudflare": _cloudflare, "pollinations": _pollinations, "huggingface": _huggingface}
+
+
+def generate_background(prompt: str) -> tuple[Image.Image | None, str | None]:
+    """Try each free provider in order (IMAGE_PROVIDERS). Returns (image, provider) or (None, None)."""
+    order = [n.strip() for n in env("IMAGE_PROVIDERS", "cloudflare,pollinations,huggingface").split(",")]
+    for name in order:
+        fn = PROVIDERS.get(name)
+        if not fn:
+            continue
         try:
-            client = InferenceClient(token=env("HF_TOKEN"))
-            img = client.text_to_image(prompt, model=env("IMAGE_MODEL"))
-            return img.convert("RGB").resize(SIZE)
+            img = fn(prompt).convert("RGB")
+            if img.size[0] >= 256:
+                return img.resize(SIZE), name
         except Exception:
             continue
-    return None
+    return None, None
 
 
-def make_card(title: str, description: str, prompt: str, brand_color: str,
-              company: str, out: Path, use_ai: bool = True, source: str = "") -> Path:
-    """Always writes an image to `out` (never raises because of the AI step)."""
-    bg = (generate_background(prompt) if use_ai else None) or gradient_background(brand_color)
+def make_card(*args, **kwargs) -> Path:
+    """Same as render_card but returns just the path."""
+    render_card(*args, **kwargs)
+    return args[5] if len(args) > 5 else kwargs["out"]
+
+
+def render_card(title: str, description: str, prompt: str, brand_color: str,
+                company: str, out: Path, use_ai: bool = True, source: str = "") -> str:
+    """Always writes an image to `out`. Returns which background was used:
+    'cloudflare' | 'pollinations' | 'huggingface' | 'gradient'."""
+    bg, provider = (None, None)
+    if use_ai:
+        bg, provider = generate_background(prompt or f"Abstract modern illustration, no text, about: {title}")
+    if bg is None:
+        bg, provider = gradient_background(brand_color), "gradient"
     img = bg.convert("RGBA")
 
     # dark fade on the left so white text stays readable on any background
@@ -117,4 +164,4 @@ def make_card(title: str, description: str, prompt: str, brand_color: str,
         d.text((SIZE[0] - PAD - d.textlength(label, font=s_font), SIZE[1] - 66), label, font=s_font, fill=(226, 230, 245))
 
     img.convert("RGB").save(out)
-    return out
+    return provider

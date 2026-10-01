@@ -72,8 +72,8 @@ def test_path_traversal_ids_rejected(bad):
         pipeline.draft_dir(bad)
 
 
-def test_approve_publishes_and_marks_status(cfg, monkeypatch):
-    vid = pipeline.create_demo_draft(cfg)
+def test_approve_publishes_and_marks_status(cfg, monkeypatch, mark_ai):
+    vid = pipeline.create_demo_draft(cfg); mark_ai(vid)
     seen = {}
     monkeypatch.setattr(pipeline, "publish", lambda text, img: seen.update(text=text, img=img) or "urn:li:share:1")
     assert pipeline.approve(vid) == "urn:li:share:1"
@@ -81,8 +81,8 @@ def test_approve_publishes_and_marks_status(cfg, monkeypatch):
     assert store.list_all(store.connect())[0]["status"] == "published"
 
 
-def test_failed_publish_keeps_draft_status(cfg, monkeypatch):
-    vid = pipeline.create_demo_draft(cfg)
+def test_failed_publish_keeps_draft_status(cfg, monkeypatch, mark_ai):
+    vid = pipeline.create_demo_draft(cfg); mark_ai(vid)
     def boom(text, img):
         raise RuntimeError("401")
     monkeypatch.setattr(pipeline, "publish", boom)
@@ -96,3 +96,23 @@ def test_post_always_names_channel_and_links_even_if_llm_forgets(fake_net, cfg):
     text = pipeline.read_text("vid00001")
     assert "Source: Chan" in text and "https://y/1" in text
     assert pipeline.read_card("vid00001")["source"] == "Chan"
+
+
+def test_publish_refused_when_image_is_only_a_gradient(cfg, monkeypatch):
+    vid = pipeline.create_demo_draft(cfg)
+    monkeypatch.setattr(pipeline, "publish", lambda t, i: "urn:never")
+    with pytest.raises(RuntimeError, match="AI-generated image"):
+        pipeline.approve(vid)
+
+
+def test_publish_allowed_without_ai_image_if_user_turns_requirement_off(cfg, monkeypatch):
+    vid = pipeline.create_demo_draft(cfg)
+    monkeypatch.setattr(pipeline, "publish", lambda t, i: "urn:ok")
+    assert pipeline.approve(vid, require_ai_image=False) == "urn:ok"
+
+
+def test_render_image_records_which_provider_made_it(cfg, monkeypatch):
+    vid = pipeline.create_demo_draft(cfg)
+    monkeypatch.setattr(pipeline, "render_card", lambda *a, **k: "pollinations")
+    assert pipeline.render_image(vid, cfg) == "pollinations"
+    assert pipeline.read_card(vid)["bg"] == "pollinations"

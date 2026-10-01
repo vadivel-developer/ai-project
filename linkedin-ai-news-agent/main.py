@@ -26,7 +26,7 @@ def main() -> None:
         for r in store.list_all(store.connect()):
             print(f"{r['video_id']}  [{r['status']}]  {r['title']}")
     elif args.command == "approve":
-        print("published:", pipeline.approve(args.video_id))
+        print("published:", pipeline.approve(args.video_id, load_config().get("require_ai_image", True)))
     elif args.command == "skip":
         store.set_status(store.connect(), args.video_id, "skipped")
 

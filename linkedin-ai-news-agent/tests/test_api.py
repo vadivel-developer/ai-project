@@ -57,16 +57,16 @@ def test_skip(client):
     assert client.get("/api/drafts").json[0]["status"] == "skipped"
 
 
-def test_approve_success_and_failure(client, monkeypatch):
-    client.post("/api/demo")
+def test_approve_success_and_failure(client, monkeypatch, mark_ai):
+    client.post("/api/demo"); mark_ai("demo0001")
     monkeypatch.setattr(pipeline, "publish", lambda t, i: "urn:1")
     r = client.post("/api/drafts/demo0001/approve")
     assert r.json == {"ok": True, "urn": "urn:1"}
     assert client.get("/api/drafts").json[0]["status"] == "published"
 
 
-def test_approve_error_returns_message_not_crash(client, monkeypatch):
-    client.post("/api/demo")
+def test_approve_error_returns_message_not_crash(client, monkeypatch, mark_ai):
+    client.post("/api/demo"); mark_ai("demo0001")
     def boom(t, i):
         raise RuntimeError("LinkedIn said no")
     monkeypatch.setattr(pipeline, "publish", boom)
@@ -84,3 +84,10 @@ def test_run_endpoint_reports_error_cleanly(client, monkeypatch):
 
 def test_bad_id_does_not_escape_drafts_folder(client):
     assert client.get("/api/drafts/..%2Fsecret/image").status_code in (400, 404, 500)
+
+
+def test_publish_blocked_without_ai_image(client):
+    client.post("/api/demo")  # demo uses a gradient, not an AI image
+    r = client.post("/api/drafts/demo0001/approve")
+    assert r.status_code == 400 and "AI-generated image" in r.json["error"]
+    assert client.get("/api/drafts").json[0]["status"] == "drafted"

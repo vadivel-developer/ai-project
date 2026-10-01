@@ -115,6 +115,8 @@ textarea:read-only{opacity:.85}
 .field input,.field textarea.sm{width:100%;min-height:0;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);font:inherit;line-height:1.5}
 .field input:focus,.field textarea.sm:focus{border-color:var(--accent);outline:3px solid var(--accent-soft)}
 .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.row .btn{flex:1 1 140px;min-height:40px;padding:0 14px}
+.imgstat{margin-top:12px;padding:8px 12px;border-radius:10px;font-size:12.5px;font-weight:500}
+.imgstat.ok{background:var(--green-soft);color:var(--green)}.imgstat.warn{background:var(--amber-soft);color:var(--amber)}
 .hint{font-size:12px;color:var(--muted);margin-top:4px}
 
 #toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,30px);opacity:0;visibility:hidden;padding:12px 22px;
@@ -232,6 +234,9 @@ function detailTiles(d){
         <div class="body" id="prev"></div>
         ${d.has_image?`<img src="/api/drafts/${d.id}/image?${Date.now()}" alt="Post image">`:""}
       </div>
+      <div class="imgstat ${d.card.bg&&d.card.bg!=="gradient"?"ok":"warn"}" id="imgstat">${
+        d.card.bg&&d.card.bg!=="gradient" ? "&#10003; AI image made by "+esc(d.card.bg)
+        : "&#9888; No AI background yet. Click <b>New AI background</b>."}</div>
       ${editable?`
       <div class="field"><label for="ctitle">Image title</label>
         <input id="ctitle" maxlength="80" value="${esc(d.card.title)}"></div>
@@ -261,7 +266,8 @@ function wire(d){
   const regen = async(newBg, btn)=>{
     btn.disabled=true; const old=btn.textContent; btn.textContent="Working...";
     await api("/api/drafts/"+d.id+"/image","POST",{title:$("#ctitle").value,description:$("#cdesc").value,new_background:newBg});
-    toast("Image updated"); load(true);
+    const c=(await api("/api/drafts")).data.find(x=>x.id===d.id);
+    toast(c&&c.card.bg&&c.card.bg!=="gradient" ? "AI image ready ("+c.card.bg+")" : "Image updated, but no AI background could be made"); load(true);
   };
   $("#img-update").onclick = e=>regen(false, e.currentTarget);
   $("#img-new").onclick = e=>regen(true, e.currentTarget);
