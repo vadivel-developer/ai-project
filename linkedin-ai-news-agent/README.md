@@ -22,6 +22,13 @@ python main.py skip <id>
 python -m pytest              # tests
 ```
 
+## Web UI
+```bash
+python app.py        # open http://localhost:5000
+```
+Review drafts, edit text, preview the LinkedIn card, then Approve, Skip, Copy text or Download image.
+Click **Try demo** to see it without any API keys.
+
 ## Notes
 - Posting needs LinkedIn **Community Management API** approval. Until then, copy `post.txt` and `image.png` and post by hand.
 - Posts are written in the LLM's own words and credit the creator with a link. Always review before approving.
