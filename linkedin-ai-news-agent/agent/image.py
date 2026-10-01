@@ -80,7 +80,7 @@ def generate_background(prompt: str, attempts: int = 2) -> Image.Image | None:
 
 
 def make_card(title: str, description: str, prompt: str, brand_color: str,
-              company: str, out: Path, use_ai: bool = True) -> Path:
+              company: str, out: Path, use_ai: bool = True, source: str = "") -> Path:
     """Always writes an image to `out` (never raises because of the AI step)."""
     bg = (generate_background(prompt) if use_ai else None) or gradient_background(brand_color)
     img = bg.convert("RGBA")
@@ -109,6 +109,12 @@ def make_card(title: str, description: str, prompt: str, brand_color: str,
         d.text((PAD, y), line, font=d_font, fill=(226, 230, 245))
         y += 44
     d.text((PAD, SIZE[1] - 70), company, font=c_font, fill="white")
+    if source:  # channel credit, bottom right
+        label = f"Source: {source}"
+        s_font = _font(24, 400)
+        while d.textlength(label, font=s_font) > SIZE[0] // 2 and len(label) > 12:
+            label = label[:-4].rstrip() + "..."
+        d.text((SIZE[0] - PAD - d.textlength(label, font=s_font), SIZE[1] - 66), label, font=s_font, fill=(226, 230, 245))
 
     img.convert("RGB").save(out)
     return out

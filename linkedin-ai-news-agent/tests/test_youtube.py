@@ -8,7 +8,8 @@ def test_latest_videos_parses_feed_and_respects_limit(monkeypatch):
     monkeypatch.setattr(youtube.feedparser, "parse", lambda url: SimpleNamespace(entries=entries))
     vids = youtube.latest_videos({"name": "Chan", "id": "UC1"}, limit=2)
     assert [v["id"] for v in vids] == ["vid0", "vid1"]
-    assert vids[0] == {"id": "vid0", "title": "T0", "url": "https://y/0", "channel": "Chan"}
+    assert vids[0] == {"id": "vid0", "title": "T0", "url": "https://y/0", "channel": "Chan",
+                       "channel_url": "https://www.youtube.com/channel/UC1"}
 
 
 def test_transcript_joined_with_real_library_api(monkeypatch):
@@ -46,7 +47,8 @@ def test_real_youtube_rss_shape_is_parsed(monkeypatch):
     monkeypatch.setattr(youtube.feedparser, "parse", lambda url: real_parse(xml))
     v = youtube.latest_videos({"name": "TMP", "id": "UC1"})[0]
     assert v == {"id": "AbC123xyz_-", "title": "A new AI paper",
-                 "url": "https://www.youtube.com/watch?v=AbC123xyz_-", "channel": "TMP"}
+                 "url": "https://www.youtube.com/watch?v=AbC123xyz_-", "channel": "TMP",
+                 "channel_url": "https://www.youtube.com/channel/UC1"}
 
 
 def test_unreadable_feed_raises_clear_error(monkeypatch):

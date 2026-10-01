@@ -35,6 +35,17 @@ Every draft always gets an image with a **title** and a **short description**.
 The background is an AI image (Hugging Face) if it works, otherwise a brand gradient, so image creation never fails.
 In the UI you can edit the image title/description, click **Update image text**, or **New AI background**.
 
+## Put it online (Render)
+1. In Render: **New > Blueprint**, pick this repo and this branch (`render.yaml` is at the repo root).
+2. Fill in the keys it asks for (`LLM_API_KEY`, `LLM_MODEL`, `HF_TOKEN`, ...). `APP_PASSWORD` is generated for you.
+3. Render shows your live URL (like `https://ai-news-studio.onrender.com`). Log in with any username and the `APP_PASSWORD`.
+- The site is password protected on purpose: it has an **Approve and publish** button for your company page.
+- On Render's free plan the disk is wiped on restart, so drafts and history can be lost. Use a paid disk or a database for real use.
+
+## Channel credit
+Every post always ends with the channel name, the channel link and the video link, added by code (not left to the AI).
+The image shows `Source: <channel>` in the corner.
+
 ## Notes
 - Posting needs LinkedIn **Community Management API** approval. Until then, copy `post.txt` and `image.png` and post by hand.
 - Posts are written in the LLM's own words and credit the creator with a link. Always review before approving.

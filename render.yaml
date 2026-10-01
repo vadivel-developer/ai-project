@@ -1,0 +1,27 @@
+# Render Blueprint: New + > Blueprint > pick this repo (and the branch with this file).
+services:
+  - type: web
+    name: ai-news-studio
+    runtime: python
+    rootDir: linkedin-ai-news-agent
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --timeout 120
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: APP_PASSWORD       # login for the site (username can be anything)
+        generateValue: true
+      - key: LLM_API_KEY
+        sync: false
+      - key: LLM_BASE_URL
+        value: https://generativelanguage.googleapis.com/v1beta/openai/
+      - key: LLM_MODEL
+        sync: false
+      - key: HF_TOKEN
+        sync: false
+      - key: IMAGE_MODEL
+        value: black-forest-labs/FLUX.1-schnell
+      - key: LINKEDIN_ACCESS_TOKEN
+        sync: false
+      - key: LINKEDIN_ORG_ID
+        sync: false

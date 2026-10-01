@@ -77,3 +77,19 @@ def write_card_text(video: dict, post: str) -> tuple[str, str]:
         first = post.strip().split("\n")[0]
         desc = first[:140]
     return title, desc
+
+
+def with_credit(post: str, video: dict) -> str:
+    """Make sure the post names the channel and links the channel and the video.
+
+    Done in code (not by the LLM) so the credit is never missing.
+    """
+    post = post.rstrip()
+    lines = []
+    if video["channel"].lower() not in post.lower():
+        lines.append(f"Source: {video['channel']}")
+    if video.get("channel_url") and video["channel_url"] not in post:
+        lines.append(f"Channel: {video['channel_url']}")
+    if video["url"] not in post:
+        lines.append(f"Watch the full video: {video['url']}")
+    return post + ("\n\n" + "\n".join(lines) if lines else "")

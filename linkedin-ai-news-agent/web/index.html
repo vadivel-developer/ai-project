@@ -87,6 +87,8 @@ nav{position:sticky;top:0;height:100vh;padding:22px 16px;background:var(--card);
   cursor:pointer;text-align:left;width:100%;transition:.15s}
 .item>span{min-width:0}
 .item b{overflow-wrap:anywhere}
+.by{display:block;font-size:11.5px;color:var(--muted)}
+.src{display:flex;gap:8px;align-items:center;margin:-4px 0 14px;font-size:12.5px;color:var(--muted)}.src b{color:var(--text);font-weight:600}
 .item:hover{border-color:var(--accent)}
 .item.sel{border-color:var(--accent);background:var(--accent-soft)}
 .thumb{width:56px;height:32px;border-radius:8px;object-fit:cover;flex:none;background:var(--line)}
@@ -205,7 +207,7 @@ function render(){
   const list = v.length ? v.map(x=>`
     <button class="item ${x.id===sel?"sel":""}" data-id="${x.id}">
       ${x.has_image?`<img class="thumb" src="/api/drafts/${x.id}/image" alt="">`:`<div class="thumb"></div>`}
-      <span><b>${esc(x.title)}</b><span class="badge ${x.status}">${NAMES[x.status]||x.status}</span></span>
+      <span><b>${esc(x.title)}</b><span class="by">${esc(x.channel)}</span><span class="badge ${x.status}">${NAMES[x.status]||x.status}</span></span>
     </button>`).join("")
     : `<div class="empty"><div class="ico">&#10024;</div>Nothing here yet.<br>Click <b>Generate drafts</b> or <b>Try demo</b>.</div>`;
   const queue = `<div class="tile queue"><h3>${NAMES[filter]} (${v.length})</h3><div class="list">${list}</div></div>`;
@@ -224,6 +226,7 @@ function detailTiles(d){
       <textarea id="text" aria-label="Post text" ${editable?"":"readonly"}>${esc(d.text)}</textarea>
       <div class="count" id="count"></div></div>
     <div class="tile preview"><h3>LinkedIn preview</h3>
+      <div class="src">&#9654; Source channel: <b>${esc(d.channel)}</b></div>
       <div class="card">
         <div class="who"><div class="av">${esc(initials)}</div><div><b>${esc(company)}</b><span>Just now</span></div></div>
         <div class="body" id="prev"></div>

@@ -1,10 +1,25 @@
 """Web UI:  python app.py   ->  http://localhost:5000"""
-from flask import Flask, jsonify, request, send_file
+import hmac
+import os
+
+from flask import Flask, Response, jsonify, request, send_file
 
 from agent import pipeline, store
 from agent.config import ROOT, load_config
 
 app = Flask(__name__, static_folder=str(ROOT / "web" / "static"), static_url_path="/static")
+
+
+@app.before_request
+def require_password():
+    """If APP_PASSWORD is set (do this when hosting online), every page needs it."""
+    pw = os.getenv("APP_PASSWORD")
+    if not pw:
+        return None
+    auth = request.authorization
+    if auth and hmac.compare_digest((auth.password or "").encode(), pw.encode()):
+        return None
+    return Response("Login required", 401, {"WWW-Authenticate": 'Basic realm="AI News Studio"'})
 
 
 @app.get("/")

@@ -6,7 +6,7 @@ from . import store
 from .config import DRAFTS_DIR
 from .image import make_card
 from .linkedin import publish
-from .writer import write_card_text, write_image_prompt, write_post
+from .writer import with_credit, write_card_text, write_image_prompt, write_post
 from .youtube import get_transcript, latest_videos
 
 ID_RE = re.compile(r"^[A-Za-z0-9_-]{3,32}$")
@@ -35,14 +35,14 @@ def create_drafts(cfg: dict, log=print) -> int:
                 continue
             folder = draft_dir(video["id"])
             folder.mkdir(parents=True, exist_ok=True)
-            post = write_post(video, transcript, cfg)
+            post = with_credit(write_post(video, transcript, cfg), video)
             (folder / "post.txt").write_text(post, encoding="utf-8")
             title, desc = write_card_text(video, post)
             try:
                 prompt = write_image_prompt(video)
             except Exception:
                 prompt = ""
-            save_card(video["id"], title, desc, prompt)
+            save_card(video["id"], title, desc, prompt, source=video["channel"])
             render_image(video["id"], cfg)
             made += 1
             log(f"draft ready: {video['title']}")
@@ -54,9 +54,12 @@ def read_card(video_id: str) -> dict:
     return json.loads(f.read_text(encoding="utf-8")) if f.exists() else {"title": "", "description": "", "prompt": ""}
 
 
-def save_card(video_id: str, title: str, description: str, prompt: str | None = None) -> None:
+def save_card(video_id: str, title: str, description: str, prompt: str | None = None,
+              source: str | None = None) -> None:
     card = read_card(video_id)
     card.update(title=title.strip(), description=description.strip())
+    if source is not None:
+        card["source"] = source
     if prompt is not None:
         card["prompt"] = prompt
     (draft_dir(video_id) / "card.json").write_text(json.dumps(card, ensure_ascii=False), encoding="utf-8")
@@ -66,7 +69,8 @@ def render_image(video_id: str, cfg: dict, use_ai: bool = True) -> None:
     """(Re)make image.png from the saved title, description and prompt. Always succeeds."""
     card = read_card(video_id)
     make_card(card["title"], card["description"], card["prompt"], cfg["brand_color"],
-              cfg["company_name"], draft_dir(video_id) / "image.png", use_ai=use_ai)
+              cfg["company_name"], draft_dir(video_id) / "image.png", use_ai=use_ai,
+              source=card.get("source", ""))
 
 
 def create_demo_draft(cfg: dict) -> str:
@@ -83,10 +87,12 @@ def create_demo_draft(cfg: dict) -> str:
         "- Agents can finally finish multi-step tasks\n"
         "- Free tiers make prototyping almost zero cost\n\n"
         "Which of these would help your team most?\n\n"
-        "Credit: Demo Channel - https://youtube.com/\n\n" + " ".join(cfg["hashtags"]),
+        "Source: Demo Channel\nChannel: https://www.youtube.com/channel/UCdemo\n"
+        "Watch the full video: https://youtube.com/\n\n" + " ".join(cfg["hashtags"]),
         encoding="utf-8")
     save_card(video["id"], "Five AI breakthroughs for this week",
-              "Smaller models, smarter agents and free tiers make AI easier to use than ever.", "")
+              "Smaller models, smarter agents and free tiers make AI easier to use than ever.", "",
+              source="Demo Channel")
     render_image(video["id"], cfg, use_ai=False)
     return video["id"]
 

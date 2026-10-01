@@ -46,7 +46,9 @@ def test_regenerate_image_updates_card(client):
     r = client.post("/api/drafts/demo0001/image",
                     json={"title": "T2", "description": "D2", "new_background": False})
     assert r.json["ok"]
-    assert client.get("/api/drafts").json[0]["card"] == {"title": "T2", "description": "D2", "prompt": ""}
+    card = client.get("/api/drafts").json[0]["card"]
+    assert (card["title"], card["description"]) == ("T2", "D2")
+    assert card["source"] == "Demo Channel"  # channel credit survives regeneration
 
 
 def test_skip(client):

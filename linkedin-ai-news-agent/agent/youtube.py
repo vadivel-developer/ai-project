@@ -17,6 +17,7 @@ def latest_videos(channel: dict, limit: int = 3) -> list[dict]:
             "title": e.title,
             "url": e.link,
             "channel": channel["name"],
+            "channel_url": f"https://www.youtube.com/channel/{channel['id']}",
         }
         for e in feed.entries[:limit]
     ]

@@ -3,7 +3,8 @@ from PIL import Image
 
 from agent import pipeline, store
 
-VIDEO = {"id": "vid00001", "title": "Big AI news", "url": "https://y/1", "channel": "Chan"}
+VIDEO = {"id": "vid00001", "title": "Big AI news", "url": "https://y/1", "channel": "Chan",
+         "channel_url": "https://www.youtube.com/channel/UC123"}
 
 
 @pytest.fixture
@@ -18,7 +19,7 @@ def fake_net(monkeypatch):
 def test_create_drafts_makes_post_card_and_image(fake_net, cfg):
     assert pipeline.create_drafts(cfg, log=lambda m: None) == 1
     folder = pipeline.draft_dir("vid00001")
-    assert (folder / "post.txt").read_text() == "Post body #AI"
+    assert (folder / "post.txt").read_text().startswith("Post body #AI")
     assert pipeline.read_card("vid00001")["title"] == "Card title"
     assert Image.open(folder / "image.png").size == (1200, 627)
     assert store.list_all(store.connect())[0]["status"] == "drafted"
@@ -88,3 +89,10 @@ def test_failed_publish_keeps_draft_status(cfg, monkeypatch):
     with pytest.raises(RuntimeError):
         pipeline.approve(vid)
     assert store.list_all(store.connect())[0]["status"] == "drafted"
+
+
+def test_post_always_names_channel_and_links_even_if_llm_forgets(fake_net, cfg):
+    pipeline.create_drafts(cfg, log=lambda m: None)
+    text = pipeline.read_text("vid00001")
+    assert "Source: Chan" in text and "https://y/1" in text
+    assert pipeline.read_card("vid00001")["source"] == "Chan"
