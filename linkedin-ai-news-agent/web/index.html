@@ -4,10 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI News Studio</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+/* Poppins is self-hosted (SIL OFL) so it works offline */
+@font-face{font-family:'Poppins';font-style:normal;font-weight:400;font-display:swap;src:url(/static/fonts/poppins-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:500;font-display:swap;src:url(/static/fonts/poppins-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:600;font-display:swap;src:url(/static/fonts/poppins-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:700;font-display:swap;src:url(/static/fonts/poppins-latin-700-normal.woff2) format('woff2')}
 /* Bento grid: flat tiles, thin borders, bold accent colours */
 :root{
   --bg:#f3f4f8; --card:#ffffff; --line:#e4e6ee; --text:#161a2e; --muted:#667090;
@@ -204,7 +206,7 @@ function render(){
     : `<div class="empty"><div class="ico">&#10024;</div>Nothing here yet.<br>Click <b>Generate drafts</b> or <b>Try demo</b>.</div>`;
   const queue = `<div class="tile queue"><h3>${NAMES[filter]} (${v.length})</h3><div class="list">${list}</div></div>`;
   $("#bento").innerHTML = stats + queue + (d ? detailTiles(d) :
-    `<div class="tile editor" style="grid-column:span 8"><div class="empty"><div class="ico">&#128221;</div>Select a draft to review it.</div></div>`);
+    `<div class="tile editor" style="grid-column:span 9"><div class="empty"><div class="ico">&#128221;</div>Select a draft to review it.</div></div>`);
   document.querySelectorAll(".item").forEach(i=>i.onclick=()=>{sel=i.dataset.id;render();
     if(innerWidth<=980) $(".editor").scrollIntoView({behavior:"smooth",block:"start"})});
   if(d) wire(d);
