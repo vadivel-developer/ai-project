@@ -1,0 +1,19 @@
+# Copy to .github/workflows/daily.yml to create drafts every day.
+name: daily-drafts
+on:
+  schedule: [{cron: "0 6 * * *"}]
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install -r linkedin-ai-news-agent/requirements.txt
+      - run: python linkedin-ai-news-agent/main.py run
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_BASE_URL: ${{ secrets.LLM_BASE_URL }}
+          LLM_MODEL: ${{ secrets.LLM_MODEL }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}

@@ -1,0 +1,9 @@
+feedparser>=6.0
+youtube-transcript-api>=0.6.2
+openai>=1.30
+huggingface_hub>=0.24
+pillow>=10.0
+requests>=2.31
+python-dotenv>=1.0
+pyyaml>=6.0
+pytest>=8.0

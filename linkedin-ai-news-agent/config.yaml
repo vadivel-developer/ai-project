@@ -1,0 +1,10 @@
+# YouTube channels to follow (channel IDs start with "UC")
+channels:
+  - name: Example AI Channel
+    id: UCXXXXXXXXXXXXXXXXXXXXXX
+
+max_videos_per_run: 3     # newest videos per channel to check
+posts_per_day: 1          # how many drafts to make per run
+company_name: Your Company
+brand_color: "#0A66C2"
+hashtags: ["#AI", "#GenerativeAI", "#Tech"]
