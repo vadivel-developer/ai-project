@@ -8,133 +8,163 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* Neumorphism (soft UI): one surface colour, two opposing shadows */
+/* Bento grid: flat tiles, thin borders, bold accent colours */
 :root{
-  --bg:#e4e9f2; --hi:#ffffff; --lo:#bcc5d8;
-  --text:#27304d; --muted:#5b6585;
-  --accent:#3a5bd9; --accent2:#6a4ff0; --accent-ink:#ffffff;
-  --ok:#0f7a58; --warn:#a85d00; --bad:#c13a2c;
-  --r:20px;
-  --raise:9px 9px 20px var(--lo),-9px -9px 20px var(--hi);
-  --raise-sm:5px 5px 11px var(--lo),-5px -5px 11px var(--hi);
-  --inset:inset 5px 5px 11px var(--lo),inset -5px -5px 11px var(--hi);
+  --bg:#f3f4f8; --card:#ffffff; --line:#e4e6ee; --text:#161a2e; --muted:#667090;
+  --accent:#4f46e5; --accent-soft:#eceafd; --accent-ink:#ffffff;
+  --amber:#b45309; --amber-soft:#fef3dc; --green:#047857; --green-soft:#dcf5ec; --gray:#5b6477; --gray-soft:#e9ebf1;
+  --bad:#c0352b; --r:18px; --nav:232px;
 }
 @media (prefers-color-scheme:dark){
-  :root{--bg:#1f2434;--hi:#2a3045;--lo:#141824;--text:#e8ecfa;--muted:#a0a9c6;
-        --accent:#7c97ff;--accent2:#a48bff;--accent-ink:#0d1226;--ok:#4fd1a5;--warn:#f2b866;--bad:#ff8878}
+  :root{--bg:#0d1020;--card:#161a2e;--line:#262c47;--text:#eef0fb;--muted:#9aa3c4;
+        --accent:#8b83ff;--accent-soft:#25244d;--accent-ink:#0d1020;
+        --amber:#f6bf6b;--amber-soft:#3a2d17;--green:#58d6a8;--green-soft:#15352c;--gray:#aab2cc;--gray-soft:#242a41;--bad:#ff8a7c}
 }
 *{box-sizing:border-box;margin:0}
-html{-webkit-text-size-adjust:100%}
 body{background:var(--bg);color:var(--text);font-family:"Poppins",system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:clamp(14px,1.6vw,15px);line-height:1.6;min-height:100vh}
+  font-size:clamp(14px,1.5vw,15px);line-height:1.6;min-height:100vh}
 button,textarea{font-family:inherit;font-size:inherit;color:inherit}
-:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 
-.shell{max-width:1240px;margin:0 auto;padding:clamp(14px,3vw,32px);display:grid;gap:clamp(16px,2.5vw,28px)}
+.app{display:grid;grid-template-columns:var(--nav) 1fr;min-height:100vh}
 
-/* header */
-header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 20px;border-radius:var(--r);box-shadow:var(--raise)}
-.logo{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-weight:700;color:var(--accent-ink);
-  background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:var(--raise-sm)}
-.brand{flex:1;min-width:170px}
-.brand h1{font-size:clamp(17px,2.4vw,21px);font-weight:600;line-height:1.2}
-.brand p{font-size:12px;color:var(--muted)}
-.hbtns{display:flex;gap:12px;flex-wrap:wrap}
+/* nav rail */
+nav{position:sticky;top:0;height:100vh;padding:22px 16px;background:var(--card);border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:6px}
+.brand{display:flex;align-items:center;gap:12px;padding:0 8px 22px}
+.logo{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-weight:700;
+  background:var(--accent);color:var(--accent-ink)}
+.brand b{display:block;font-weight:600;line-height:1.2}
+.brand span{font-size:11.5px;color:var(--muted)}
+.nav-btn{display:flex;align-items:center;gap:12px;width:100%;min-height:44px;padding:0 12px;border:0;border-radius:12px;
+  background:transparent;color:var(--muted);cursor:pointer;font-weight:500;text-align:left;transition:.15s}
+.nav-btn:hover{background:var(--bg);color:var(--text)}
+.nav-btn.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.nav-btn .n{margin-left:auto;font-size:12px;font-weight:600;padding:1px 9px;border-radius:99px;background:var(--bg);color:var(--text)}
+.nav-btn.on .n{background:var(--accent);color:var(--accent-ink)}
+.nav-btn svg{width:20px;height:20px;flex:none}
+.grow{flex:1}
+.tip{padding:14px;border-radius:14px;background:var(--bg);font-size:12px;color:var(--muted)}
 
-/* buttons */
-.btn{border:0;cursor:pointer;min-height:44px;padding:0 22px;border-radius:14px;background:var(--bg);
-  font-weight:500;box-shadow:var(--raise-sm);transition:box-shadow .18s,transform .18s,opacity .18s;
-  display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
-a.btn{color:inherit}
-.btn:hover{transform:translateY(-1px)}
-.btn:active{box-shadow:var(--inset);transform:none}
-.btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
-.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--accent-ink);font-weight:600}
-.btn.primary:active{box-shadow:inset 3px 3px 8px rgba(0,0,0,.28)}
+/* content */
+.content{padding:clamp(16px,3vw,34px);display:grid;gap:clamp(14px,2vw,22px);align-content:start;min-width:0}
+.top{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.top h2{font-size:clamp(20px,3vw,26px);font-weight:600;flex:1;min-width:180px}
+.top h2 small{display:block;font-size:13px;font-weight:400;color:var(--muted)}
+
+.btn{border:1px solid var(--line);cursor:pointer;min-height:44px;padding:0 20px;border-radius:12px;background:var(--card);
+  font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;color:var(--text);
+  transition:transform .15s,border-color .15s,opacity .15s}
+.btn:hover{border-color:var(--accent);transform:translateY(-1px)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
 .btn.danger{color:var(--bad)}
 
-/* layout */
-main{display:grid;grid-template-columns:minmax(280px,360px) 1fr;gap:clamp(16px,2.5vw,28px);align-items:start}
-.panel{border-radius:var(--r);box-shadow:var(--raise);padding:clamp(14px,2vw,22px)}
+/* bento */
+.bento{display:grid;gap:clamp(14px,2vw,22px);grid-template-columns:repeat(12,1fr)}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:clamp(16px,2vw,24px);min-width:0}
+.tile h3{font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.stat{grid-column:span 4;display:flex;align-items:center;gap:16px}
+.stat .num{font-size:clamp(30px,4vw,42px);font-weight:700;line-height:1}
+.stat .lbl{font-size:13px;color:var(--muted)}
+.stat .dot{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;margin-left:auto;background:var(--c-soft);color:var(--c)}
+.stat .dot svg{width:24px;height:24px}
+.s-drafted{--c:var(--amber);--c-soft:var(--amber-soft)}
+.s-published{--c:var(--green);--c-soft:var(--green-soft)}
+.s-skipped{--c:var(--gray);--c-soft:var(--gray-soft)}
 
-/* segmented filter */
-.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:5px;border-radius:16px;box-shadow:var(--inset);margin-bottom:18px}
-.seg button{border:0;background:transparent;cursor:pointer;min-height:38px;padding:0 4px;border-radius:12px;
-  font-size:12px;font-weight:500;color:var(--muted);text-transform:capitalize;transition:.18s}
-.seg button.on{background:var(--bg);color:var(--text);font-weight:600;box-shadow:var(--raise-sm)}
-.seg small{opacity:.75;margin-left:3px}
+.queue{grid-column:span 3;grid-row:span 2}
+.editor{grid-column:span 5}
+.preview{grid-column:span 4}
+.actions{grid-column:4/-1;display:flex;flex-direction:row;flex-wrap:wrap;gap:10px;align-items:center}
+.actions h3,.actions .hint{flex:1 1 100%;margin:0}
+.actions .btn{flex:1 1 150px}
 
-/* list */
-.list{display:grid;gap:14px;max-height:68vh;overflow:auto;padding:6px 8px 10px 6px;margin:-6px -8px -10px -6px}
-.item{display:flex;gap:12px;align-items:center;padding:12px;border-radius:16px;cursor:pointer;background:var(--bg);
-  border:0;text-align:left;width:100%;box-shadow:var(--raise-sm);transition:.18s}
-.item.sel{box-shadow:var(--inset)}
-.thumb{width:68px;height:38px;border-radius:9px;object-fit:cover;flex:none;box-shadow:var(--raise-sm);background:var(--lo)}
+.list{display:grid;gap:10px;max-height:62vh;overflow:auto;margin:-4px;padding:4px}
+.item{display:flex;gap:12px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:14px;background:var(--card);
+  cursor:pointer;text-align:left;width:100%;transition:.15s}
+.item>span{min-width:0}
+.item b{overflow-wrap:anywhere}
+.item:hover{border-color:var(--accent)}
+.item.sel{border-color:var(--accent);background:var(--accent-soft)}
+.thumb{width:56px;height:32px;border-radius:8px;object-fit:cover;flex:none;background:var(--line)}
 .item b{display:block;font-size:13px;font-weight:600;line-height:1.35}
-.badge{display:inline-block;margin-top:4px;font-size:11px;font-weight:600;padding:1px 10px;border-radius:99px;box-shadow:var(--inset);color:var(--c)}
-.drafted{--c:var(--warn)}.published{--c:var(--ok)}.skipped{--c:var(--muted)}
-.empty{padding:36px 12px;text-align:center;color:var(--muted)}
-.empty .ico{width:64px;height:64px;margin:0 auto 14px;border-radius:50%;display:grid;place-items:center;font-size:26px;box-shadow:var(--inset)}
+.badge{display:inline-block;margin-top:4px;font-size:11px;font-weight:600;padding:0 10px;border-radius:99px;color:var(--c);background:var(--c-soft)}
+.drafted{--c:var(--amber);--c-soft:var(--amber-soft)}.published{--c:var(--green);--c-soft:var(--green-soft)}.skipped{--c:var(--gray);--c-soft:var(--gray-soft)}
+.empty{padding:34px 10px;text-align:center;color:var(--muted)}
+.empty .ico{font-size:30px;margin-bottom:8px}
 
-/* editor */
-.editor{display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,2.5vw,26px)}
-label{display:block;font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
-textarea{width:100%;min-height:clamp(240px,42vh,380px);resize:vertical;border:0;border-radius:16px;padding:16px;
-  background:var(--bg);box-shadow:var(--inset);line-height:1.65}
+textarea{width:100%;min-height:clamp(220px,38vh,360px);resize:vertical;padding:16px;border-radius:14px;border:1px solid var(--line);
+  background:var(--bg);line-height:1.65}
+textarea:focus{border-color:var(--accent);outline:3px solid var(--accent-soft)}
 textarea:read-only{opacity:.85}
 .count{font-size:12px;color:var(--muted);text-align:right;margin-top:8px}
 .count.over{color:var(--bad);font-weight:600}
-.card{border-radius:18px;box-shadow:var(--raise-sm);overflow:hidden;background:var(--bg)}
+.card{border:1px solid var(--line);border-radius:14px;overflow:hidden}
 .who{display:flex;gap:12px;align-items:center;padding:14px}
-.av{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-weight:700;font-size:13px;
-  color:var(--accent-ink);background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.av{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;font-weight:700;font-size:13px;background:var(--accent);color:var(--accent-ink)}
 .who b{font-weight:600;font-size:14px;display:block;line-height:1.2}
 .who span{font-size:11px;color:var(--muted)}
 .body{padding:0 14px 14px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13.5px}
 .card img{width:100%;display:block}
-.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
-.note{margin-top:20px;padding:14px 16px;border-radius:14px;box-shadow:var(--inset);font-size:12.5px;color:var(--muted)}
+.hint{font-size:12px;color:var(--muted);margin-top:4px}
 
-#toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,30px);opacity:0;visibility:hidden;
-  padding:12px 22px;border-radius:99px;background:var(--bg);box-shadow:var(--raise);font-weight:500;
-  transition:.25s;max-width:90vw;z-index:20;text-align:center}
+#toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,30px);opacity:0;visibility:hidden;padding:12px 22px;
+  border-radius:99px;background:var(--text);color:var(--bg);font-weight:500;transition:.25s;max-width:90vw;z-index:30;text-align:center}
 #toast.show{transform:translate(-50%,0);opacity:1;visibility:visible}
 
 /* responsive */
-@media(max-width:980px){.editor{grid-template-columns:1fr}}
-@media(max-width:860px){main{grid-template-columns:1fr}.list{max-height:none}}
-@media(max-width:520px){
-  header{padding:12px 14px}
-  .hbtns{width:100%}.hbtns .btn{flex:1}
-  .actions .btn{flex:1 1 calc(50% - 6px);padding:0 12px}
-  .seg button{font-size:11px}.seg small{display:none}
+@media(max-width:1280px){
+  .queue{grid-column:span 5;grid-row:auto}.editor{grid-column:span 7}
+  .preview{grid-column:span 7}.actions{grid-column:span 5}
 }
+@media(max-width:980px){
+  .queue,.editor,.preview,.actions{grid-column:1/-1}
+  .actions{flex-direction:row;flex-wrap:wrap}.actions h3,.actions .hint{flex:1 1 100%}.actions .btn{flex:1 1 calc(50% - 5px)}
+  .list{max-height:none}
+}
+@media(max-width:820px){
+  .app{grid-template-columns:1fr}
+  nav{position:fixed;inset:auto 0 0 0;height:auto;z-index:20;flex-direction:row;padding:6px 8px calc(6px + env(safe-area-inset-bottom));
+      border-right:0;border-top:1px solid var(--line);gap:4px}
+  .brand,.grow,.tip{display:none}
+  .nav-btn{flex-direction:column;gap:2px;justify-content:center;padding:6px 4px;font-size:11px;min-height:54px;text-align:center}
+  .nav-btn .n{margin:0;padding:0 7px;font-size:10px}
+  .content{padding-bottom:100px}
+  .stat{padding:14px;gap:8px}.stat .dot{display:none}.stat .num{font-size:28px}.stat .lbl{font-size:12px}
+}
+@media(min-width:821px) and (max-width:1100px){.stat .dot{width:40px;height:40px}}
+@media(max-width:520px){.top .btn{flex:1}.stat{padding:12px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
-<div class="shell">
-  <header>
-    <div class="logo">AI</div>
-    <div class="brand"><h1>AI News Studio</h1><p>YouTube to LinkedIn, with your approval</p></div>
-    <div class="hbtns">
+<div class="app">
+  <nav aria-label="Sections" id="nav"></nav>
+  <div class="content">
+    <div class="top">
+      <h2>Content queue<small id="subtitle">YouTube to LinkedIn, with your approval</small></h2>
       <button class="btn" id="demo">Try demo</button>
       <button class="btn primary" id="run">Generate drafts</button>
     </div>
-  </header>
-  <main>
-    <section class="panel" aria-label="Drafts">
-      <div class="seg" id="tabs" role="tablist"></div>
-      <div class="list" id="list"></div>
-    </section>
-    <section class="panel" id="detail" aria-live="polite"></section>
-  </main>
+    <section class="bento" id="bento"></section>
+  </div>
 </div>
 <div id="toast" role="status"></div>
 <script>
 const $ = s => document.querySelector(s);
 let drafts = [], sel = null, filter = "drafted", company = "Your company";
-const FILTERS = ["drafted","published","skipped","all"];
+const ICON = {
+  drafted:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>',
+  published:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.1V12a10 10 0 11-5.9-9.1"/><path d="M22 4L12 14l-3-3"/></svg>',
+  skipped:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4l10 8-10 8z"/><path d="M19 5v14"/></svg>',
+  all:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>'
+};
+const NAMES = {drafted:"To review", published:"Published", skipped:"Skipped", all:"All"};
+const FILTERS = Object.keys(NAMES);
+const count = f => f==="all"?drafts.length:drafts.filter(d=>d.status===f).length;
+const visible = () => drafts.filter(d => filter==="all" || d.status===filter);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");
   clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("show"),3400)}
@@ -142,79 +172,85 @@ async function api(path, method="GET", body){
   const r = await fetch(path,{method,headers:{"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined});
   return {ok:r.ok, data: await r.json().catch(()=>({}))};
 }
-const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const visible = () => drafts.filter(d => filter==="all" || d.status===filter);
-
 async function load(keep){
   drafts = (await api("/api/drafts")).data;
   if(!keep || !drafts.find(d=>d.id===sel)) sel = (visible()[0]||{}).id || null;
   render();
 }
 
-function render(){
-  $("#tabs").innerHTML = FILTERS.map(f=>{
-    const n = f==="all"?drafts.length:drafts.filter(d=>d.status===f).length;
-    return `<button role="tab" aria-selected="${f===filter}" class="${f===filter?"on":""}" data-f="${f}">${f}<small>${n}</small></button>`}).join("");
-  document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{filter=b.dataset.f;sel=(visible()[0]||{}).id||null;render()});
-  const v = visible();
-  $("#list").innerHTML = v.length ? v.map(d=>`
-    <button class="item ${d.id===sel?"sel":""}" data-id="${d.id}">
-      ${d.has_image?`<img class="thumb" src="/api/drafts/${d.id}/image" alt="">`:`<div class="thumb"></div>`}
-      <span><b>${esc(d.title)}</b><span class="badge ${d.status}">${d.status}</span></span>
-    </button>`).join("")
-    : `<div class="empty"><div class="ico">&#10024;</div>Nothing here yet.<br>Click <b>Generate drafts</b> or <b>Try demo</b>.</div>`;
-  document.querySelectorAll(".item").forEach(i=>i.onclick=()=>{sel=i.dataset.id;render();
-    if(innerWidth<=860) $("#detail").scrollIntoView({behavior:"smooth",block:"start"})});
-  renderDetail();
+function renderNav(){
+  $("#nav").innerHTML = `
+    <div class="brand"><div class="logo">AI</div><div><b>News Studio</b><span>${esc(company)}</span></div></div>
+    ${FILTERS.map(f=>`<button class="nav-btn ${f===filter?"on":""}" data-f="${f}" aria-current="${f===filter}">
+      ${ICON[f]}<span>${NAMES[f]}</span><span class="n">${count(f)}</span></button>`).join("")}
+    <div class="grow"></div>
+    <div class="tip">Edit the text, check the preview, then approve. Nothing posts without your click.</div>`;
+  document.querySelectorAll(".nav-btn").forEach(b=>b.onclick=()=>{
+    filter=b.dataset.f; sel=(visible()[0]||{}).id||null; render(); scrollTo({top:0,behavior:"smooth"})});
 }
 
-function renderDetail(){
+function render(){
+  renderNav();
   const d = drafts.find(x=>x.id===sel);
-  if(!d){$("#detail").innerHTML=`<div class="empty"><div class="ico">&#128221;</div>Select a draft to review it.</div>`;return}
+  const stats = ["drafted","published","skipped"].map(s=>`
+    <div class="tile stat s-${s}"><div><div class="num">${count(s)}</div><div class="lbl">${NAMES[s]}</div></div>
+    <div class="dot">${ICON[s]}</div></div>`).join("");
+  const v = visible();
+  const list = v.length ? v.map(x=>`
+    <button class="item ${x.id===sel?"sel":""}" data-id="${x.id}">
+      ${x.has_image?`<img class="thumb" src="/api/drafts/${x.id}/image" alt="">`:`<div class="thumb"></div>`}
+      <span><b>${esc(x.title)}</b><span class="badge ${x.status}">${NAMES[x.status]||x.status}</span></span>
+    </button>`).join("")
+    : `<div class="empty"><div class="ico">&#10024;</div>Nothing here yet.<br>Click <b>Generate drafts</b> or <b>Try demo</b>.</div>`;
+  const queue = `<div class="tile queue"><h3>${NAMES[filter]} (${v.length})</h3><div class="list">${list}</div></div>`;
+  $("#bento").innerHTML = stats + queue + (d ? detailTiles(d) :
+    `<div class="tile editor" style="grid-column:span 8"><div class="empty"><div class="ico">&#128221;</div>Select a draft to review it.</div></div>`);
+  document.querySelectorAll(".item").forEach(i=>i.onclick=()=>{sel=i.dataset.id;render();
+    if(innerWidth<=980) $(".editor").scrollIntoView({behavior:"smooth",block:"start"})});
+  if(d) wire(d);
+}
+
+function detailTiles(d){
   const editable = d.status==="drafted";
   const initials = company.split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase();
-  $("#detail").innerHTML = `
-    <div class="editor">
-      <div>
-        <label for="text">Post text</label>
-        <textarea id="text" ${editable?"":"readonly"}>${esc(d.text)}</textarea>
-        <div class="count" id="count"></div>
-      </div>
-      <div>
-        <label>LinkedIn preview</label>
-        <div class="card">
-          <div class="who"><div class="av">${esc(initials)}</div><div><b>${esc(company)}</b><span>Just now</span></div></div>
-          <div class="body" id="prev"></div>
-          ${d.has_image?`<img src="/api/drafts/${d.id}/image?${Date.now()}" alt="Post image">`:""}
-        </div>
-      </div>
-    </div>
-    <div class="actions">
+  return `
+    <div class="tile editor"><h3>Post text</h3>
+      <textarea id="text" aria-label="Post text" ${editable?"":"readonly"}>${esc(d.text)}</textarea>
+      <div class="count" id="count"></div></div>
+    <div class="tile preview"><h3>LinkedIn preview</h3>
+      <div class="card">
+        <div class="who"><div class="av">${esc(initials)}</div><div><b>${esc(company)}</b><span>Just now</span></div></div>
+        <div class="body" id="prev"></div>
+        ${d.has_image?`<img src="/api/drafts/${d.id}/image?${Date.now()}" alt="Post image">`:""}
+      </div></div>
+    <div class="tile actions"><h3>Actions</h3>
       ${editable?`<button class="btn primary" id="approve">Approve and publish</button>
-                  <button class="btn" id="save">Save edits</button>
-                  <button class="btn danger" id="skip">Skip</button>`:""}
+                  <button class="btn" id="save">Save edits</button>`:""}
       <button class="btn" id="copy">Copy text</button>
       ${d.has_image?`<a class="btn" href="/api/drafts/${d.id}/image" download="${d.id}.png">Download image</a>`:""}
       <a class="btn" href="${esc(d.url)}" target="_blank" rel="noopener">Open video</a>
-    </div>
-    <div class="note">Not connected to LinkedIn yet? Use <b>Copy text</b> and <b>Download image</b>, then post it by hand.</div>`;
-  const ta = $("#text");
+      ${editable?`<button class="btn danger" id="skip">Skip this one</button>`:""}
+      <div class="hint">No LinkedIn link yet? Copy the text, download the image, and post by hand.</div>
+    </div>`;
+}
+
+function wire(d){
+  const editable = d.status==="drafted", ta = $("#text");
   const upd = () => {$("#prev").textContent = ta.value;
     $("#count").textContent = ta.value.length+" / 3000"; $("#count").className="count"+(ta.value.length>3000?" over":"")};
   ta.oninput = upd; upd();
   $("#copy").onclick = async()=>{try{await navigator.clipboard.writeText(ta.value);toast("Copied to clipboard")}catch{toast("Copy failed")}};
-  if(editable){
-    $("#save").onclick = async()=>{await api("/api/drafts/"+d.id,"POST",{text:ta.value});toast("Saved");load(true)};
-    $("#skip").onclick = async()=>{await api("/api/drafts/"+d.id+"/skip","POST");toast("Skipped");load()};
-    $("#approve").onclick = async e=>{
-      if(!confirm("Publish this post to your LinkedIn company page?")) return;
-      e.target.disabled = true;
-      await api("/api/drafts/"+d.id,"POST",{text:ta.value});
-      const r = await api("/api/drafts/"+d.id+"/approve","POST");
-      toast(r.ok ? "Published to LinkedIn" : "Could not publish: "+(r.data.error||"unknown error"));
-      load(true);
-    };
-  }
+  if(!editable) return;
+  $("#save").onclick = async()=>{await api("/api/drafts/"+d.id,"POST",{text:ta.value});toast("Saved");load(true)};
+  $("#skip").onclick = async()=>{await api("/api/drafts/"+d.id+"/skip","POST");toast("Skipped");load()};
+  $("#approve").onclick = async e=>{
+    if(!confirm("Publish this post to your LinkedIn company page?")) return;
+    e.currentTarget.disabled = true;
+    await api("/api/drafts/"+d.id,"POST",{text:ta.value});
+    const r = await api("/api/drafts/"+d.id+"/approve","POST");
+    toast(r.ok ? "Published to LinkedIn" : "Could not publish: "+(r.data.error||"unknown error"));
+    load(true);
+  };
 }
 
 $("#run").onclick = async e=>{
